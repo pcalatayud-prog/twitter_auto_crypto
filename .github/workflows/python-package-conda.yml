@@ -29,4 +29,4 @@ jobs:
         # Add comments explaining the reason behind specific versions
 
       - name: Run Python Script
-        run: python ./most_trendy_1h.py
+        run: python ./1h_crypto.py
