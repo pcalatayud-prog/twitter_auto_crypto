@@ -67,7 +67,7 @@ headers = {
     'X-CMC_PRO_API_KEY': API_KEY,
 }
 
-def get_all_crypto_data(limit=1000):
+def get_all_crypto_data(limit=500):
     url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'
     parameters = {
         'limit': limit,
