@@ -1,6 +1,7 @@
 name: worst
 
 on:
+  push:
   schedule:
     - cron: "0 * * * *"
 
