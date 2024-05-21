@@ -1,4 +1,6 @@
 on:
+  push:
+  
   schedule:
     - cron: "30 * * * *"
 
@@ -26,4 +28,4 @@ jobs:
         # Add comments explaining the reason behind specific versions
 
       - name: Run Python Script
-        run: python ./crypto_1h.py
+        run: python ./coinmarket_api_24h.py
