@@ -584,6 +584,9 @@ line = line + percent_change_30d + "\n"
 line = line + percent_change_90d + "\n"
 line = line + percent_change_1y + "\n"
 line = line + percent_change_5y + "\n"
+
+line = line + "#crypto #cryptos #BTCUSD #DigitalAsset #DeFi #blockchain #investing #finance #trading"
+
 #------------#
 
 print(line)
