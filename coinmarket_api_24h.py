@@ -309,14 +309,285 @@ len(best_1y)
 
 post(best_1y)
 
+#------------------bitcoin account -------------------#
+import requests
+import tweepy
+import pandas as pd
+import yfinance as yf
 
-# In[ ]:
+
+def post_2(text: str):
+    
+    access_token = "1795765251423543296-YQ3pLG6ltWwjml2DmKGkx2KwkQoAw2"
+
+    access_token_secret = "Bk2UrP2dBlghvqubEMFywpPW4czx4JM7VFKFX16G6fQ8X"
+
+    bearer = "AAAAAAAAAAAAAAAAAAAAAAkiuAEAAAAAMM6iOgVusW7HQK8kryygU7%2BFL70%3DkxD49c3YilKNb3l8Pn5VV0PzlyCBWnj1YXm7HmSnanFpKGUrLx"
+
+    api_key = "XVJ6Y57C916dObzbAKjGyIoB1"
+
+    api_key_secret = "5EEDsvh6lFBBJskYTVSppVxvVnTWZ8DIcZ2usqNBXWCm2CSNnv"
+    
+    # Authenticate to Twitter
+    client = tweepy.Client(
+        bearer_token = bearer,
+        consumer_key=api_key,
+        consumer_secret=api_key_secret,
+        access_token=access_token,
+        access_token_secret=access_token_secret
+    )
+
+    # Post Tweet
+    message = text
+    client.create_tweet(text=message)
+    
+    return None
+
+# Constants
+green = "\U0001F7E2"
+red = "\U0001F534"
+
+#Retriving from CoinMarket
+API_KEY = "f30a7111-fdbc-4608-a34d-ef8a426ca0ad"
+url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
+parameters = {
+    'symbol': 'BTC',
+    'convert': 'USD'
+}
+headers = {
+    'Accepts': 'application/json',
+    'X-CMC_PRO_API_KEY': API_KEY,
+}
+
+response = requests.get(url, headers=headers, params=parameters)
+data = response.json()
+
+#Retriving EUR/USD
+def get_eur_usd_exchange_rate(price):
+    # Ticker for EUR/USD exchange rate
+    ticker = 'EURUSD=X'
+    
+    # Get the ticker data
+    eur_usd = yf.Ticker(ticker)
+    
+    # Fetch the current price
+    exchange_rate = eur_usd.history(period='1d')['Close'].iloc[-1]
+    
+    return round((price/exchange_rate),2)
+
+#Retriving Bitcoin 
+# Define the ticker symbol for Bitcoin
+ticker_symbol = 'BTC-USD'
+
+# Fetch the historical data
+bitcoin_data = yf.Ticker(ticker_symbol)
+
+# Define the period and interval of the historical data
+# Options for period: '1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', 'ytd', 'max'
+# Options for interval: '1m', '2m', '5m', '15m', '30m', '60m', '90m', '1h', '1d', '5d', '1wk', '1mo', '3mo'
+historical_data = bitcoin_data.history(period='max', interval='1d')
+
+from datetime import datetime, timedelta
+
+# Get the current date
+current_date = historical_data.index[-1]
+
+# Calculate the dates for one year ago and five years ago
+one_year_ago = current_date - timedelta(days=365)
+five_years_ago = current_date - timedelta(days=365 * 5)
+ten_years_ago = current_date - timedelta(days=365 * 10)
 
 
+# Find the closest dates manually
+def find_closest_date(data, target_date):
+    closest_date = min(data.index, key=lambda d: abs(d - target_date))
+    return closest_date
+
+one_year_ago_closest_date = find_closest_date(historical_data, one_year_ago)
+five_years_ago_closest_date = find_closest_date(historical_data, five_years_ago)
+ten_years_ago_closest_date = find_closest_date(historical_data, ten_years_ago)
+
+# Get the rows for the closest dates
+one_year_ago_row = historical_data.loc[one_year_ago_closest_date]
+five_years_ago_row = historical_data.loc[five_years_ago_closest_date]
+ten_years_ago_row = historical_data.loc[ten_years_ago_closest_date]
+
+# Print the results
+#print(f"Row from one year ago (closest to {one_year_ago.date()}):\n{one_year_ago_row}\n")
+#print(f"Row from five years ago (closest to {five_years_ago.date()}):\n{five_years_ago_row}\n")
+#print(f"Row from ten years ago (closest to {ten_years_ago.date()}):\n{ten_years_ago_row}\n")
+#---------------#
+#---------------#
+#---------------#
+price_usd = round(data["data"]["BTC"]["quote"]["USD"]["price"],2)
+price=price_usd
+print(price_usd)
+#---------------#
+#---------------#
+#---------------#
+price_eur = get_eur_usd_exchange_rate(price_usd)
+print(price_eur)
+
+price_usd = str(price_usd)
+price_eur = str(price_eur)
+
+#------------#
+one_year_ago_row_price = one_year_ago_row["Close"]
+one_year_ago_row_price
+#-----------#
+five_years_ago_price = five_years_ago_row["Close"]
+five_years_ago_price
+#-----------#
+ten_years_ago_price = ten_years_ago_row["Close"]
+ten_years_ago_price
+#----------#
+price_change_1h = round(data["data"]["BTC"]["quote"]["USD"]["percent_change_1h"],2)
+if price_change_1h>0:
+    
+    price_change_1h = str(price_change_1h) 
+    
+    price_change_1h = green + "1h -> +" + price_change_1h + " %"
+    
+    print(price_change_1h)
+    
+else:
+    price_change_1h = str(price_change_1h) 
+    
+    price_change_1h = red + "1h -> " + price_change_1h + " %"
+    
+    print(price_change_1h)
 
 
+price_change_24h = round(data["data"]["BTC"]["quote"]["USD"]["percent_change_24h"],2)
+if price_change_24h>0:
+    
+    price_change_24h = str(price_change_24h) 
+    
+    price_change_24h = green + "24h -> +" + price_change_24h + " %"
+    
+    print(price_change_24h)
+    
+else:
+    price_change_24h = str(price_change_24h) 
+    
+    price_change_24h = red + "24h -> " + price_change_24h + " %"
+    
+    print(price_change_24h)
 
-# In[ ]:
+percent_change_7d = round(data["data"]["BTC"]["quote"]["USD"]["percent_change_7d"],2)
+if percent_change_7d>0:
+    
+    percent_change_7d = str(percent_change_7d) 
+    
+    percent_change_7d = green + "7d -> +" + percent_change_7d + " %"
+    
+    print(percent_change_7d)
+    
+else:
+    percent_change_7d = str(percent_change_7d) 
+    
+    percent_change_7d = red + "7d -> " + percent_change_7d + " %"
+    
+    print(percent_change_7d)
+
+percent_change_30d = round(data["data"]["BTC"]["quote"]["USD"]["percent_change_30d"],2)
+if percent_change_30d>0:
+    
+    percent_change_30d = str(percent_change_30d) 
+    
+    percent_change_30d = green + "30d -> +" + percent_change_30d + " %"
+    
+    print(percent_change_30d)
+    
+else:
+    percent_change_30d = str(percent_change_30d) 
+    
+    percent_change_30d = red + "30d -> " + percent_change_30d + " %"
+    
+    print(percent_change_30d)
+
+percent_change_90d = round(data["data"]["BTC"]["quote"]["USD"]["percent_change_90d"],2)
+if percent_change_90d>0:
+    
+    percent_change_90d = str(percent_change_90d) 
+    
+    percent_change_90d = green + "90d -> +" + percent_change_90d + " %"
+    
+    print(percent_change_90d)
+    
+else:
+    percent_change_90d = str(percent_change_90d) 
+    
+    percent_change_90d = red + "90d -> " + percent_change_90d + " %"
+    
+    print(percent_change_90d)
+
+percent_change_1y = round(100*(price-one_year_ago_row_price)/one_year_ago_row_price,2)
+if percent_change_1y>0:
+    
+    percent_change_1y = str(percent_change_1y) 
+    
+    percent_change_1y = green + "1y -> +" + percent_change_1y + " %"
+    
+    print(percent_change_1y)
+    
+else:
+    percent_change_1y = str(percent_change_1y) 
+    
+    percent_change_1y = red + "1y -> " + percent_change_1y + " %"
+    
+    print(percent_change_1y)
+
+percent_change_5y = round(100*(price-five_years_ago_price)/five_years_ago_price,2)
+if percent_change_5y>0:
+    
+    percent_change_5y = str(percent_change_5y) 
+    
+    percent_change_5y = green + "5y -> +" + percent_change_5y + " %"
+    
+    print(percent_change_5y)
+    
+else:
+    percent_change_5y = str(percent_change_5y) 
+    
+    percent_change_5y = red + "5y -> " + percent_change_5y + " %"
+    
+    print(percent_change_5y)
+    
+percent_change_10y = round(100*(price-ten_years_ago_price)/ten_years_ago_price,2)
+if percent_change_10y>0:
+    
+    percent_change_10y = str(percent_change_10y) 
+    
+    percent_change_10y = green + "10y -> +" + percent_change_10y + " %"
+    
+    print(percent_change_10y)
+    
+else:
+    percent_change_10y = str(percent_change_10y) 
+    
+    percent_change_10y = red + "10y -> " + percent_change_10y + " %"
+    
+    print(percent_change_10y)
+    
+    
+    
+    
+line = f"#Bitcoin Actualización:\n"
+line = line + price_usd + " USD\n" 
+line = line + price_eur + " EUR\n"
+line = line + "Cambio del precio de #BTC\n"
+line = line + price_change_1h + "\n"
+line = line + price_change_24h + "\n"
+line = line + percent_change_7d + "\n"
+line = line + percent_change_30d + "\n"
+line = line + percent_change_90d + "\n"
+line = line + percent_change_1y + "\n"
+line = line + percent_change_5y + "\n"
+#------------#
+
+print(line)
+post_2(line)
 
 
 
