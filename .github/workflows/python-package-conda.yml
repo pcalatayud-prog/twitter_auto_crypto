@@ -29,4 +29,4 @@ jobs:
         # Add comments explaining the reason behind specific versions
 
       - name: Run Python Script
-        run: python /coinmarket_api_24h.py
+        run: python /home/runner/work/twitter_crypto_2/coinmarket_api_24h.py
