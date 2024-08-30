@@ -2,7 +2,7 @@ on:
   push:
   
   schedule:
-    - cron: "30 * * * *"
+    - cron: "135 * * * *"
 
 jobs:
   build-linux:
