@@ -573,10 +573,9 @@ else:
     
     
     
-line = f"#Bitcoin Actualización:\n"
+line = f"#BTC #Bitcoin Actualización:\n"
 line = line + price_usd + " USD\n" 
 line = line + price_eur + " EUR\n"
-line = line + "Cambio del precio de #BTC\n"
 line = line + price_change_1h + "\n"
 line = line + price_change_24h + "\n"
 line = line + percent_change_7d + "\n"
