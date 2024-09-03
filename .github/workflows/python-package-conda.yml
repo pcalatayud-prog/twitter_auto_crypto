@@ -2,11 +2,8 @@ on:
   push:
   
   schedule:
-        # First job: runs every 2 hours
-    - cron: "0 */2 * * *"
-    
-    # Second job: runs every 2 hours and 15 minutes
-    - cron: "15 1-23/2 * * *"
+       
+    - cron: "0 */4 * * *"
 
 jobs:
   build-linux:
