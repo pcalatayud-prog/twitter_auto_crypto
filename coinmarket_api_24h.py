@@ -583,6 +583,7 @@ line = line + percent_change_30d + "\n"
 line = line + percent_change_90d + "\n"
 line = line + percent_change_1y + "\n"
 line = line + percent_change_5y + "\n"
+line = line + percent_change_10y + "\n"
 
 line = line + "#crypto #cryptos #BTCUSD #DeFi #blockchain #investing #finance #trading"
 
