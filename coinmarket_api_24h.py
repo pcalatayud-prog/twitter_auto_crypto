@@ -431,6 +431,25 @@ print(price_eur)
 price_usd = str(price_usd)
 price_eur = str(price_eur)
 
+def format_number_with_commas(number_str):
+    # Split the number into integer and decimal parts
+    if '.' in number_str:
+        integer_part, decimal_part = number_str.split('.')
+    else:
+        integer_part, decimal_part = number_str, ''
+
+    # Add commas to the integer part
+    integer_part_with_commas = "{:,}".format(int(integer_part))
+
+    # Combine the integer part with the decimal part
+    if decimal_part:
+        return f"{integer_part_with_commas}.{decimal_part}"
+    else:
+        return integer_part_with_commas
+
+price_usd = format_number_with_commas(price_usd)
+price_eur = format_number_with_commas(price_eur)
+
 #------------#
 one_year_ago_row_price = one_year_ago_row["Close"]
 one_year_ago_row_price
@@ -569,13 +588,15 @@ else:
     percent_change_10y = red + "10y -> " + percent_change_10y + " %"
     
     print(percent_change_10y)
+
+percent_change_10y = format_number_with_commas(percent_change_10y)
+percent_change_5y = format_number_with_commas(percent_change_5y)
     
     
     
     
 line = f"#BTC #Bitcoin Actualización:\n"
-line = line + price_usd + " USD\n" 
-line = line + price_eur + " EUR\n"
+line = line + price_usd + " USD." + price_eur + " EUR\n"" 
 line = line + price_change_1h + "\n"
 line = line + price_change_24h + "\n"
 line = line + percent_change_7d + "\n"
