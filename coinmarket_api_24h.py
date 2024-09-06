@@ -589,8 +589,8 @@ else:
     
     print(percent_change_10y)
 
-percent_change_10y = format_number_with_commas(percent_change_10y)
-percent_change_5y = format_number_with_commas(percent_change_5y)
+# percent_change_10y = format_number_with_commas(percent_change_10y)
+# percent_change_5y = format_number_with_commas(percent_change_5y)
     
     
     
