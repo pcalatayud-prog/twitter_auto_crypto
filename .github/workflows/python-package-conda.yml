@@ -3,8 +3,8 @@ on:
   
   schedule:
        
-    - cron: "0 */4 * * *"
-
+    - cron: "15,45 * * * *"
+    
 jobs:
   build-linux:
     runs-on: ubuntu-latest
