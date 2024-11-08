@@ -593,10 +593,17 @@ else:
 # percent_change_5y = format_number_with_commas(percent_change_5y)
     
     
+max_value = round(historical_data['High'].max(),2)
+max_index = historical_data['High'].idxmax()
+max_value_eur = round(get_eur_usd_exchange_rate(max_value),2)
+formatted_date = max_index.strftime('%d/%m/%Y')
+
+line_0 = f'ATH -> {formatted_date} -> {max_value} $  &  {max_value_eur} €'
+
     
-    
-line = f"#BTC #Bitcoin Actualización:\n"
-line = line + price_usd + " USD.   &   " + price_eur + " EUR\n"
+line = f"#BTC #Bitcoin" + "\n"
+line = line + price_usd + " $  &  " + price_eur + " €\n"
+line = line + line_0 + "\n"
 line = line + price_change_1h + "\n"
 line = line + price_change_24h + "\n"
 line = line + percent_change_7d + "\n"
@@ -606,7 +613,7 @@ line = line + percent_change_1y + "\n"
 line = line + percent_change_5y + "\n"
 line = line + percent_change_10y + "\n"
 
-line = line + "#crypto #cryptos #BTCUSD #DeFi #blockchain #investing #finance #trading"
+line = line + "#crypto #DeFi #blockchain #investing"
 
 #------------#
 print("\n\n\n\n\n")
