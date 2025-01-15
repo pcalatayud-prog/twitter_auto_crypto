@@ -1,10 +1,8 @@
 on:
   push:
-  
   schedule:
-       
     - cron: "3 * * * *"
-    
+
 jobs:
   build-linux:
     runs-on: ubuntu-latest
@@ -20,15 +18,9 @@ jobs:
         with:
           python-version: '3.9'
 
-      - name: Install Dependencies
+      - name: Install Dependencies from requirements.txt
         run: |
-          pip install numpy==1.21.2
-          pip install pandas==1.5.3
-          pip install requests==2.31.0
-          pip install tweepy==4.14.0
-          pip install yfinance==0.2.37
-        # Add error handling if any of the installations fail
-        # Add comments explaining the reason behind specific versions
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; else echo "requirements.txt not found!"; exit 1; fi
 
       - name: Run Python Script
         run: python ./main.py
