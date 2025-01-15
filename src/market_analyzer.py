@@ -15,7 +15,7 @@ class MarketAnalyzer:
         }
         self.df = None
 
-    def get_all_crypto_data(self, limit=100) -> Optional[dict]:
+    def get_all_crypto_data(self, limit=150) -> Optional[dict]:
         """Fetch data for top cryptocurrencies."""
         url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'
         parameters = {'limit': limit}
@@ -66,7 +66,7 @@ class MarketAnalyzer:
                 change = round(sorted_df['Percent Change 24h (%)'].iloc[i], 2)
                 emoji = Emojis.GREEN_CIRCLE if change > 0 else Emojis.RED_CIRCLE
 
-                report.append(f"{i+1}.{emoji} ${symbol}: {change}%")
+                report.append(f"{i+1}.{emoji} ${symbol} -> {change}%")
 
             return '\n'.join(report)
         except Exception as e:
