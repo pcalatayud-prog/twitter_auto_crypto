@@ -120,14 +120,13 @@ class CryptoTracker:
             symbol_tag = '#BTC #Bitcoin' if self.cmc_symbol == 'BTC' else '#ADA #Cardano'
             report = [
                 f"{symbol_tag}",
-                f"{self.format_price(price_usd)} $  &  {self.format_price(price_eur)} €",
-                f"ATH -> {ath_date.strftime('%d/%m/%Y')} -> {self.format_price(ath_price)} $  &  {self.format_price(ath_eur)} €"
+                f"{self.format_price(price_usd)} $  &  {self.format_price(price_eur)} €"
             ]
 
             # Add all period changes
             for period, change in changes.items():
                 report.append(self.format_price_change(round(change, 2), period))
-
+            report.append(f"ATH -> {ath_date.strftime('%d/%m/%Y')} -> {self.format_price(ath_price)} $  &  {self.format_price(ath_eur)} €")
             report.append("#crypto #DeFi #blockchain #investing")
 
             return '\n'.join(report)
