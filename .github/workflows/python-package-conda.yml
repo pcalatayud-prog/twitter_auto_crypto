@@ -1,7 +1,7 @@
 on:
   push:
   schedule:
-    - cron: 59 */4 * * *"  # Run at the 3rd minute of every 4th hour
+    - cron: "59 */4 * * *"  # Run at the 3rd minute of every 4th hour
 
 jobs:
   build-linux:
