@@ -58,7 +58,7 @@ class MarketAnalyzer:
             sorted_df = df.sort_values(by='abs', ascending=False)
 
             top_coins = sorted_df.head(10)
-            report = [f"#Crypto 10-Movers 24-hour % Changes!\n"]
+            report = [f"#Crypto 10-Movers 24-hour % Changes!"]
 
             for i in range(10):
 
