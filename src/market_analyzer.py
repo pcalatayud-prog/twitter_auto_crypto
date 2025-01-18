@@ -39,6 +39,7 @@ class MarketAnalyzer:
             df = pd.DataFrame({
                 'Name': [crypto['name'] for crypto in crypto_data],
                 'Symbol': [crypto['symbol'] for crypto in crypto_data],
+                'Rank': [crypto['cmc_rank'] for crypto in crypto_data],
                 'Price (USD)': [crypto['quote']['USD']['price'] for crypto in crypto_data],
                 'Market Cap (USD)': [crypto['quote']['USD']['market_cap'] for crypto in crypto_data],
                 'Volume 24h (USD)': [crypto['quote']['USD']['volume_24h'] for crypto in crypto_data],
@@ -58,15 +59,15 @@ class MarketAnalyzer:
             sorted_df = df.sort_values(by='abs', ascending=False)
 
             top_coins = sorted_df.head(10)
-            report = [f"#Crypto 10-Movers 24-hour % Changes!"]
+            report = [f"#Crypto 10-Movers 24-hour & rank!"]
 
             for i in range(10):
-
                 symbol = sorted_df['Symbol'].iloc[i]
-                change = round(sorted_df['Percent Change 24h (%)'].iloc[i], 2)
+                rank = sorted_df['Rank'].iloc[i]
+                change = round(sorted_df['Percent Change 24h (%)'].iloc[i])
                 emoji = Emojis.GREEN_CIRCLE if change > 0 else Emojis.RED_CIRCLE
 
-                report.append(f"{i+1}.{emoji} ${symbol} -> {change}%")
+                report.append(f"{i+1}.{emoji} ${symbol} -> {change}% ({rank})")
 
             return '\n'.join(report)
         except Exception as e:
@@ -103,3 +104,4 @@ if __name__ == "__main__":
     market = MarketAnalyzer()
     movers = market.run()
     print(movers)
+    print(len(movers))

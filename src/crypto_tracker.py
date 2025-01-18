@@ -1,5 +1,3 @@
-# src/crypto_tracker.py
-
 import yfinance as yf
 import requests
 from datetime import datetime, timedelta
@@ -16,10 +14,17 @@ class CryptoTracker:
             self.cmc_symbol = 'ADA'
             self.yf_symbol = 'ADA-USD'
             self.is_ada = True
+            self.is_trump = False
         elif symbol == 'BTC-USD':
             self.cmc_symbol = 'BTC'
             self.yf_symbol = 'BTC-USD'
             self.is_ada = False
+            self.is_trump = False
+        elif symbol == 'TRUMP-USD':
+            self.cmc_symbol = 'TRUMP'
+            self.yf_symbol = 'TRUMP-USD'
+            self.is_ada = False
+            self.is_trump = True
         self.historical_data = None
         self._initialize_api()
 
@@ -57,8 +62,8 @@ class CryptoTracker:
 
     def format_price(self, price: float) -> str:
         """Format price based on coin type."""
-        if self.is_ada:
-            return f"{price:,.2f}"
+        if self.is_ada or self.is_trump:
+            return f"{price:,.2f}"  # Using 4 decimal places for TRUMP token
         else:
             return f"{int(price):,}"
 
@@ -75,10 +80,13 @@ class CryptoTracker:
 
         returns = {}
         for period, days in periods.items():
-            target_date = current_date - timedelta(days=days)
-            closest_date = min(self.historical_data.index, key=lambda d: abs(d - target_date))
-            historical_price = self.historical_data.loc[closest_date, 'Close']
-            returns[period] = round(((current_price - historical_price) / historical_price) * 100, 2)
+            try:
+                target_date = current_date - timedelta(days=days)
+                closest_date = min(self.historical_data.index, key=lambda d: abs(d - target_date))
+                historical_price = self.historical_data.loc[closest_date, 'Close']
+                returns[period] = round(((current_price - historical_price) / historical_price) * 100, 2)
+            except:
+                returns[period] = 0  # Handle case where historical data isn't available
 
         return returns
 
@@ -97,7 +105,7 @@ class CryptoTracker:
             historical_data = self.get_historical_data()
 
             # Current prices
-            price_usd = round(current_data['quote']['USD']['price'], 2)
+            price_usd = round(current_data['quote']['USD']['price'], 4)  # 4 decimal places for TRUMP
             price_eur = self.get_eur_price(price_usd)
 
             # Get all time period changes
@@ -117,16 +125,26 @@ class CryptoTracker:
             ath_price, ath_date, ath_eur = self.get_ath_data()
 
             # Format the report
-            symbol_tag = '#BTC #Bitcoin' if self.cmc_symbol == 'BTC' else '#ADA #Cardano'
+            # Get coin rank
+            rank = current_data['cmc_rank']
+
+            if self.cmc_symbol == 'BTC':
+                symbol_tag = '#BTC #Bitcoin'
+            elif self.cmc_symbol == 'ADA':
+                symbol_tag = '#ADA #Cardano'
+            else:
+                symbol_tag = '#TRUMP'
+
             report = [
-                f"{symbol_tag}",
+                f"{symbol_tag} (Rank #{rank})",
                 f"{self.format_price(price_usd)} $  &  {self.format_price(price_eur)} €"
             ]
 
             # Add all period changes
             for period, change in changes.items():
                 report.append(self.format_price_change(round(change, 2), period))
-            report.append(f"ATH -> {ath_date.strftime('%d/%m/%Y')} -> {self.format_price(ath_price)} $  &  {self.format_price(ath_eur)} €")
+            report.append(
+                f"ATH -> {ath_date.strftime('%d/%m/%Y')} -> {self.format_price(ath_price)} $  &  {self.format_price(ath_eur)} €")
             report.append("#crypto #DeFi #blockchain #investing")
 
             return '\n'.join(report)
@@ -136,15 +154,10 @@ class CryptoTracker:
 
 
 if __name__ == "__main__":
-    # Test BTC
-    tracker = CryptoTracker('BTC-USD')
-    report = tracker.run()
-    print("Bitcoin Report:")
-    print(report)
-    print("\n" + "="*50 + "\n")
-
-    # Test ADA
-    tracker = CryptoTracker('ADA-USD')
-    report = tracker.run()
-    print("Cardano Report:")
-    print(report)
+    # Test all cryptocurrencies
+    for symbol in ['BTC-USD', 'ADA-USD', 'TRUMP-USD']:
+        tracker = CryptoTracker(symbol)
+        report = tracker.run()
+        print(f"{symbol} Report:")
+        print(report)
+        print("\n" + "=" * 50 + "\n")

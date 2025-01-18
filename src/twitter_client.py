@@ -22,6 +22,12 @@ class TwitterClient:
             self.bearer = TwitterCredentials.ADA_BEARER
             self.api_key = TwitterCredentials.ADA_API_KEY
             self.api_key_secret = TwitterCredentials.ADA_API_KEY_SECRET
+        elif self.account_type == 'TRUMP':
+            self.access_token = TwitterCredentials.TRUMP_ACCESS_TOKEN
+            self.access_token_secret = TwitterCredentials.TRUMP_ACCESS_TOKEN_SECRET
+            self.bearer = TwitterCredentials.TRUMP_BEARER
+            self.api_key = TwitterCredentials.TRUMP_API_KEY
+            self.api_key_secret = TwitterCredentials.TRUMP_API_KEY_SECRET
         else:  # NEWS
             self.access_token = TwitterCredentials.NEWS_ACCESS_TOKEN
             self.access_token_secret = TwitterCredentials.NEWS_ACCESS_TOKEN_SECRET

@@ -11,6 +11,13 @@ def main():
     btc_twitter = TwitterClient(account_type='BTC')
     ada_twitter = TwitterClient(account_type='ADA')
     news_twitter = TwitterClient(account_type='NEWS')
+    trump_twitter = TwitterClient(account_type='TRUMP')
+
+    # Post TRUMP update
+    trump_tracker = CryptoTracker('TRUMP-USD')
+    trump_report = trump_tracker.run()
+    trump_twitter.post_tweet(trump_report)
+
 
     # Post BTC update
     btc_tracker = CryptoTracker('BTC-USD')
@@ -35,8 +42,6 @@ def main():
         market_df = analyzer.create_market_dataframe(crypto_data)
         top_gainers = analyzer.generate_top_movers_report(market_df)
         news_twitter.post_tweet(top_gainers)
-
-
 
 
 if __name__ == "__main__":
