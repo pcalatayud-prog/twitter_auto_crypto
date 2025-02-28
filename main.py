@@ -30,14 +30,14 @@ def main():
     # Add delay between posts
     time.sleep(2)
 
-    try:
-        # Post ADA update
-        ada_twitter = TwitterClient(account_type='ADA')
-        ada_tracker = CryptoTracker('ADA-USD')
-        ada_report = ada_tracker.run()
-        ada_twitter.post_tweet(ada_report)
-    except:
-        print('error ada')
+    # try:
+    #     # Post ADA update
+    #     ada_twitter = TwitterClient(account_type='ADA')
+    #     ada_tracker = CryptoTracker('ADA-USD')
+    #     ada_report = ada_tracker.run()
+    #     ada_twitter.post_tweet(ada_report)
+    # except:
+    #     print('error ada')
     
     
     # Add delay between posts
