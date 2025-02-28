@@ -9,14 +9,14 @@ import time
 def main():
     # Initialize clients
 
-    try:
-        # Post TRUMP update
-        trump_twitter = TwitterClient(account_type='TRUMP')
-        trump_tracker = CryptoTracker('TRUMP-USD')
-        trump_report = trump_tracker.run()
-        trump_twitter.post_tweet(trump_report)
-    except:
-        print('error trump')
+    # try:
+    #     # Post TRUMP update
+    #     trump_twitter = TwitterClient(account_type='TRUMP')
+    #     trump_tracker = CryptoTracker('TRUMP-USD')
+    #     trump_report = trump_tracker.run()
+    #     trump_twitter.post_tweet(trump_report)
+    # except:
+    #     print('error trump')
 
     try:
         # Post BTC update
