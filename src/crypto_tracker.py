@@ -141,10 +141,10 @@ class CryptoTracker:
             ]
 
             # Add all period changes
+
+            report.append(f"ATH -> {ath_date.strftime('%d/%m/%Y')} -> {self.format_price(ath_price)} $  &  {self.format_price(ath_eur)} €")
+            
             for period, change in changes.items():
-                
-                report.append(
-                f"ATH -> {ath_date.strftime('%d/%m/%Y')} -> {self.format_price(ath_price)} $  &  {self.format_price(ath_eur)} €")
                 
                 report.append(self.format_price_change(round(change, 2), period))
             
