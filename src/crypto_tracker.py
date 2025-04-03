@@ -148,7 +148,7 @@ class CryptoTracker:
                 
                 report.append(self.format_price_change(round(change, 2), period))
             
-            report.append(""Hey @Grok, ¿cómo ves el precio de Bitcoin? 🚀📉"")
+            report.append("Hey @Grok, ¿cómo ves el precio de Bitcoin? 🚀📉")
 
             return '\n'.join(report)
         except Exception as e:
