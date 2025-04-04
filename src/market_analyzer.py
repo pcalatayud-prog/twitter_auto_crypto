@@ -69,7 +69,7 @@ class MarketAnalyzer:
 
                 report.append(f"{i+1}.{emoji} ${symbol} -> {change}% ({rank})")
 
-            report.append("What do you think @grok?")
+            report.append("What do you think @Grok?")
             
             return '\n'.join(report)
         except Exception as e:
