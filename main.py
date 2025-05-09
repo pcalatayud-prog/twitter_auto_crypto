@@ -24,7 +24,7 @@ def main():
         btc_tracker = CryptoTracker('BTC-USD')
         btc_report = btc_tracker.run()
         btc_twitter.post_tweet(btc_report)
-    except Exception as e
+    except Exception as e:
         print(f'error btc: {e}')
     
     # Add delay between posts
