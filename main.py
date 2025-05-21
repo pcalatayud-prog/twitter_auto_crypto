@@ -5,7 +5,6 @@ from src.crypto_tracker import CryptoTracker
 from src.market_analyzer import MarketAnalyzer
 import time
 
-
 def main():
     # Initialize clients
 
