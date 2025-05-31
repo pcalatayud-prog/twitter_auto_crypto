@@ -56,7 +56,7 @@ class TwitterClient:
         try:
             # Uncomment the line below to actually post tweets
             self.client.create_tweet(text=text)
-            # logger.info(f'Tweet content: {text}')
-            print(f'Mocking posting tweet: {text}')
+            logger.info(f'Tweet content: {text}')
+            # print(f'Mocking posting tweet: {text}')
         except Exception as e:
             logger.error(f"Error posting tweet: {e}")

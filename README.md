@@ -6,8 +6,9 @@ An automated Twitter bot that posts regular Bitcoin price updates with detailed 
 
 - Automated Bitcoin price tracking and reporting
 - Multiple message formats:
-  - Standard format (70% probability): Price and price changes across different time periods
+  - Standard format (50% probability): Price and price changes across different time periods
   - Detailed format (30% probability): Focused on supply metrics, volume, market cap, ATH and key performance indicators
+  - Blocks format (20% probability): Bitcoin blockchain statistics, block height, halving countdown
 - Market analysis with top movers report
 - Data sourced from CoinMarketCap API for current prices and metrics
 - Historical data from Yahoo Finance for long-term analysis

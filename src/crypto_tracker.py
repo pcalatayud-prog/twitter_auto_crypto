@@ -12,6 +12,7 @@ from config.constants import Emojis
 import pandas as pd
 from typing import Dict, Tuple, Optional
 from loguru import logger
+from src.bitcoin_blocks_call import get_bitcoin_block_height, estimate_halving_end, format_twitter_message
 
 
 class CryptoTracker:
@@ -161,9 +162,7 @@ class CryptoTracker:
         report = [
             f"#BTC #Bitcoin (Rank #{rank})",
             f"💰 Price: {self.format_price(price_usd)} $ | {self.format_price(price_eur)} €",
-            f"🏆 ATH: {self.format_price(ath_price)} $ ({ath_date.strftime('%d/%m/%Y')})",
-            f"📊 24h Change: {self.format_price_change(round(changes['24h'], 2), '')}"
-        ]
+            f"🏆 ATH: {self.format_price(ath_price)} $ ({ath_date.strftime('%d/%m/%Y')})"]
         
         # Add supply metrics
         report.append(f"⛏️ Supply -> {round(supply_percentage, 2)}% minado,  {int(circulating_supply):,}/{int(max_supply):,} ")
@@ -181,6 +180,33 @@ class CryptoTracker:
         report.append("@Grok, que piensas?  🧠🚀")
 
         return '\n'.join(report)
+        
+    def generate_blocks_report(self, data: Dict) -> str:
+        """Generate Bitcoin report focused on block information and halving."""
+        logger.info("Generating Bitcoin blocks report")
+        
+        # Get the current Bitcoin block height
+        block_height = get_bitcoin_block_height()
+        if block_height is None:
+            logger.error("Failed to fetch Bitcoin block height")
+            # Fallback to standard report if block height fetch fails
+            return self.generate_standard_report(data)
+            
+        # Calculate halving-related metrics
+        remainder = block_height % 210_000
+        halving_end = estimate_halving_end(remainder)
+        
+        # Create the formatted message
+        blocks_report = format_twitter_message(block_height, remainder, halving_end)
+        
+        # Add the price at the end for context
+        current_data = data['current_data']
+        price_usd = data['price_usd']
+        
+        blocks_report += f"\n\nPrice: ${self.format_price(price_usd)} | Rank #{current_data['cmc_rank']}"
+        blocks_report += "\n@Grok, ¿cuándo crees que ocurrirá el halving? 🕙⛓️"
+        
+        return blocks_report
 
     def run(self, message_type: str = 'standard') -> str:
         """Generate a complete price report with the specified message format."""
@@ -236,6 +262,8 @@ class CryptoTracker:
             logger.info(f"Generating {message_type} report")
             if message_type == 'detailed':
                 return self.generate_detailed_report(data)
+            elif message_type == 'blocks':
+                return self.generate_blocks_report(data)
             else:  # standard format
                 return self.generate_standard_report(data)
                 
@@ -245,15 +273,15 @@ class CryptoTracker:
 
 
 if __name__ == "__main__":
-    # Test both message formats for Bitcoin
+    # Test all message formats for Bitcoin
     tracker = CryptoTracker('BTC-USD')
-    
-    standard_report = tracker.run('standard')
-    print("Standard Report:")
-    print(standard_report)
+
+    import random
+
+    report_type = random.choice(['standard', 'detailed', 'blocks'])
+    report = tracker.run(report_type)
+
+    print(f"{report_type.capitalize()} Report:")
+    print(report)
     print("\n" + "=" * 50 + "\n")
-    
-    detailed_report = tracker.run('detailed')
-    print("Detailed Report:")
-    print(detailed_report)
-    print("\n" + "=" * 50 + "\n")
+

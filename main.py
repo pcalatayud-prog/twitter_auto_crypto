@@ -27,8 +27,11 @@ def main():
         logger.info("Initializing CryptoTracker")
         btc_tracker = CryptoTracker('BTC-USD')
         
-        # Select message format with 30% probability for detailed, 70% for standard
-        message_type = random.choices(['standard', 'detailed'], weights=[0.7, 0.3])[0]
+        # Select message format with probability distribution:
+        # - standard: 50%
+        # - detailed: 30%
+        # - blocks: 20%
+        message_type = random.choices(['standard', 'detailed', 'blocks'], weights=[0.4, 0.3, 0.3])[0]
         logger.info(f"Selected message format: {message_type}")
         
         btc_report = btc_tracker.run(message_type=message_type)
