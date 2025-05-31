@@ -50,7 +50,7 @@ def main():
     try:
         # Post market analysis
         logger.info("Initializing Twitter client for market analysis")
-        news_twitter = TwitterClient(account_type='BTC')  # Using BTC account for news as well
+        news_twitter = TwitterClient(account_type='NEWS')
         
         logger.info("Initializing MarketAnalyzer")
         analyzer = MarketAnalyzer()

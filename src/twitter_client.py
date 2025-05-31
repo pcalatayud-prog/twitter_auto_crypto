@@ -22,13 +22,20 @@ class TwitterClient:
 
     def _setup_credentials(self) -> None:
         """Set up API credentials based on account type."""
-        # Only supporting BTC account now
         if self.account_type == 'BTC':
             self.access_token = TwitterCredentials.BTC_ACCESS_TOKEN
             self.access_token_secret = TwitterCredentials.BTC_ACCESS_TOKEN_SECRET
             self.bearer = TwitterCredentials.BTC_BEARER
             self.api_key = TwitterCredentials.BTC_API_KEY
             self.api_key_secret = TwitterCredentials.BTC_API_KEY_SECRET
+            logger.info(f"Using Bitcoin Twitter account")
+        elif self.account_type == 'NEWS':
+            self.access_token = TwitterCredentials.NEWS_ACCESS_TOKEN
+            self.access_token_secret = TwitterCredentials.NEWS_ACCESS_TOKEN_SECRET
+            self.bearer = TwitterCredentials.NEWS_BEARER
+            self.api_key = TwitterCredentials.NEWS_API_KEY
+            self.api_key_secret = TwitterCredentials.NEWS_API_KEY_SECRET
+            logger.info(f"Using News Twitter account")
         else:
             logger.warning(f"Unsupported account type: {self.account_type}, defaulting to BTC")
             self.access_token = TwitterCredentials.BTC_ACCESS_TOKEN
