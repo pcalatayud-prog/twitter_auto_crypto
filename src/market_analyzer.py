@@ -4,6 +4,7 @@ import pandas as pd
 import requests
 import sys
 import os
+import json
 
 # Add the project root to the path so we can import config
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -14,9 +15,12 @@ from loguru import logger
 
 class MarketAnalyzer:
     def __init__(self):
+        api_key = CoinMarketCapCredentials.API_KEY
+        logger.info(f"Initializing MarketAnalyzer with API key: {'*****' + api_key[-4:] if api_key else 'None'}")
+        
         self.headers = {
             'Accepts': 'application/json',
-            'X-CMC_PRO_API_KEY': CoinMarketCapCredentials.API_KEY,
+            'X-CMC_PRO_API_KEY': api_key,
         }
         self.df = None
 
@@ -24,18 +28,32 @@ class MarketAnalyzer:
         """Fetch data for top cryptocurrencies."""
         url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'
         parameters = {'limit': limit}
-
+        
+        logger.info(f"Fetching top {limit} cryptocurrencies data from CoinMarketCap")
+        
         try:
             response = requests.get(url, headers=self.headers, params=parameters)
+            logger.debug(f"API Response status code: {response.status_code}")
+            
             data = response.json()
-
-            if 'error' in data:
-                print("Error:", data['status']['error_message'])
+            
+            # Log response structure for debugging
+            logger.debug(f"API Response keys: {list(data.keys())}")
+            
+            if 'status' in data and data['status']['error_code'] != 0:
+                error_msg = data['status'].get('error_message', 'Unknown error')
+                logger.error(f"API Error: {error_msg}")
                 return None
-
+                
+            if 'data' not in data:
+                logger.error(f"Missing 'data' in API response: {json.dumps(data)[:500]}")
+                return None
+                
+            logger.info(f"Successfully fetched data for {len(data['data'])} cryptocurrencies")
             return data['data']
+            
         except Exception as e:
-            print(f"Error fetching crypto data: {e}")
+            logger.exception(f"Error fetching crypto data: {e}")
             return None
 
     def create_market_dataframe(self, crypto_data: dict) -> pd.DataFrame:

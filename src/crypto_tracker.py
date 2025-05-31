@@ -1,6 +1,7 @@
 import yfinance as yf
 import requests
 import sys
+import json
 from datetime import datetime, timedelta
 import os
 
@@ -10,6 +11,7 @@ from config.api_keys import CoinMarketCapCredentials
 from config.constants import Emojis
 import pandas as pd
 from typing import Dict, Tuple, Optional
+from loguru import logger
 
 
 class CryptoTracker:
@@ -22,18 +24,48 @@ class CryptoTracker:
         self._initialize_api()
 
     def _initialize_api(self) -> None:
+        api_key = CoinMarketCapCredentials.API_KEY
+        logger.info(f"Initializing API with key: {'*****' + api_key[-4:] if api_key else 'None'}")
+        
         self.headers = {
             'Accepts': 'application/json',
-            'X-CMC_PRO_API_KEY': CoinMarketCapCredentials.API_KEY,
+            'X-CMC_PRO_API_KEY': api_key,
         }
 
     def get_current_data(self) -> Dict:
         """Get current price and changes from CoinMarketCap."""
         url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
         parameters = {'symbol': self.cmc_symbol, 'convert': 'USD'}
-
-        response = requests.get(url, headers=self.headers, params=parameters)
-        return response.json()['data'][self.cmc_symbol]
+        
+        logger.info(f"Fetching data for {self.cmc_symbol} from CoinMarketCap")
+        
+        try:
+            response = requests.get(url, headers=self.headers, params=parameters)
+            response_json = response.json()
+            
+            # Log the response structure
+            logger.debug(f"API Response status code: {response.status_code}")
+            logger.debug(f"API Response keys: {list(response_json.keys())}")
+            
+            if 'status' in response_json and response_json['status']['error_code'] != 0:
+                error_msg = response_json['status'].get('error_message', 'Unknown error')
+                logger.error(f"API Error: {error_msg}")
+                raise Exception(f"API Error: {error_msg}")
+                
+            if 'data' not in response_json:
+                logger.error(f"Missing 'data' in API response: {json.dumps(response_json)[:500]}")
+                raise Exception("Missing 'data' in API response")
+                
+            if self.cmc_symbol not in response_json['data']:
+                logger.error(f"Symbol {self.cmc_symbol} not found in response data")
+                logger.debug(f"Available symbols: {list(response_json['data'].keys())}")
+                raise Exception(f"Symbol {self.cmc_symbol} not found in response")
+                
+            return response_json['data'][self.cmc_symbol]
+            
+        except Exception as e:
+            logger.exception(f"Error getting current data: {str(e)}")
+            raise
 
     def get_historical_data(self) -> pd.DataFrame:
         """Get historical price data from Yahoo Finance."""
@@ -153,15 +185,24 @@ class CryptoTracker:
     def run(self, message_type: str = 'standard') -> str:
         """Generate a complete price report with the specified message format."""
         try:
+            logger.info("Starting to generate Bitcoin report")
+            
             # Get all necessary data
+            logger.info("Fetching current price data from CoinMarketCap")
             current_data = self.get_current_data()
+            
+            logger.info("Fetching historical data from Yahoo Finance")
             historical_data = self.get_historical_data()
 
             # Current prices
             price_usd = current_data['quote']['USD']['price']
+            logger.info(f"Current BTC price: ${price_usd:,.2f}")
+            
+            logger.info("Converting to EUR")
             price_eur = self.get_eur_price(price_usd)
 
             # Get all time period changes
+            logger.info("Extracting time period changes")
             changes = {
                 '1h': current_data['quote']['USD']['percent_change_1h'],
                 '24h': current_data['quote']['USD']['percent_change_24h'],
@@ -171,11 +212,14 @@ class CryptoTracker:
             }
 
             # Add historical returns
+            logger.info("Calculating historical returns")
             historical_returns = self.calculate_historical_returns()
             changes.update(historical_returns)
 
             # Get ATH data
+            logger.info("Retrieving ATH data")
             ath_price, ath_date, ath_eur = self.get_ath_data()
+            logger.info(f"ATH: ${ath_price:,.2f} on {ath_date}")
 
             # Prepare data dictionary for report generation
             data = {
@@ -189,13 +233,14 @@ class CryptoTracker:
             }
 
             # Generate report based on message type
+            logger.info(f"Generating {message_type} report")
             if message_type == 'detailed':
                 return self.generate_detailed_report(data)
             else:  # standard format
                 return self.generate_standard_report(data)
                 
         except Exception as e:
-            print(f"Error generating report: {e}")
+            logger.exception(f"Error generating report: {str(e)}")
             return ""
 
 
