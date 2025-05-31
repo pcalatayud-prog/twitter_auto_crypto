@@ -3,56 +3,39 @@
 from src.twitter_client import TwitterClient
 from src.crypto_tracker import CryptoTracker
 from src.market_analyzer import MarketAnalyzer
+import random
 import time
 
 def main():
-    # Initialize clients
-
-    # try:
-    #     # Post TRUMP update
-    #     trump_twitter = TwitterClient(account_type='TRUMP')
-    #     trump_tracker = CryptoTracker('TRUMP-USD')
-    #     trump_report = trump_tracker.run()
-    #     trump_twitter.post_tweet(trump_report)
-    # except:
-    #     print('error trump')
-
     try:
         # Post BTC update
         btc_twitter = TwitterClient(account_type='BTC')
         btc_tracker = CryptoTracker('BTC-USD')
-        btc_report = btc_tracker.run()
+        
+        # Select message format with 30% probability for detailed, 70% for standard
+        message_type = random.choices(['standard', 'detailed'], weights=[0.7, 0.3])[0]
+        btc_report = btc_tracker.run(message_type=message_type)
+        
         btc_twitter.post_tweet(btc_report)
+        print(f'Successfully posted Bitcoin update with {message_type} format')
     except Exception as e:
-        print(f'error btc: {e}')
-    
-    # Add delay between posts
-    time.sleep(2)
+        print(f'Error posting Bitcoin update: {e}')
 
-    # try:
-    #     # Post ADA update
-    #     ada_twitter = TwitterClient(account_type='ADA')
-    #     ada_tracker = CryptoTracker('ADA-USD')
-    #     ada_report = ada_tracker.run()
-    #     ada_twitter.post_tweet(ada_report)
-    # except:
-    #     print('error ada')
-    
-    
     # Add delay between posts
     time.sleep(2)
 
     try:
         # Post market analysis
-        news_twitter = TwitterClient(account_type='NEWS')
+        news_twitter = TwitterClient(account_type='BTC')  # Using BTC account for news as well
         analyzer = MarketAnalyzer()
         crypto_data = analyzer.get_all_crypto_data()
         if crypto_data:
             market_df = analyzer.create_market_dataframe(crypto_data)
-            top_gainers = analyzer.generate_top_movers_report(market_df)
-            news_twitter.post_tweet(top_gainers)
-    except:
-        print('error crypto alert')
+            top_movers = analyzer.generate_top_movers_report(market_df)
+            news_twitter.post_tweet(top_movers)
+            print('Successfully posted market analysis')
+    except Exception as e:
+        print(f'Error posting market analysis: {e}')
 
 
 if __name__ == "__main__":

@@ -2,6 +2,11 @@
 
 import pandas as pd
 import requests
+import sys
+import os
+
+# Add the project root to the path so we can import config
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from config.api_keys import CoinMarketCapCredentials
 from typing import Tuple, Optional
 from config.constants import Emojis

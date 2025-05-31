@@ -3,3 +3,4 @@ pandas==2.2.3
 Requests==2.32.3
 tweepy==4.14.0
 yfinance==0.2.59
+python-dotenv==1.0.1

@@ -1,30 +1,23 @@
 import yfinance as yf
 import requests
+import sys
 from datetime import datetime, timedelta
+import os
+
+# Add the project root to the path so we can import config
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from config.api_keys import CoinMarketCapCredentials
 from config.constants import Emojis
 import pandas as pd
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Optional
 
 
 class CryptoTracker:
     def __init__(self, symbol: str):
         self.symbol = symbol
-        if symbol == 'ADA-USD':
-            self.cmc_symbol = 'ADA'
-            self.yf_symbol = 'ADA-USD'
-            self.is_ada = True
-            self.is_trump = False
-        elif symbol == 'BTC-USD':
-            self.cmc_symbol = 'BTC'
-            self.yf_symbol = 'BTC-USD'
-            self.is_ada = False
-            self.is_trump = False
-        elif symbol == 'TRUMP-USD':
-            self.cmc_symbol = 'TRUMP'
-            self.yf_symbol = 'TRUMP-USD'
-            self.is_ada = False
-            self.is_trump = True
+        # We're only supporting BTC now
+        self.cmc_symbol = 'BTC'
+        self.yf_symbol = 'BTC-USD'
         self.historical_data = None
         self._initialize_api()
 
@@ -52,7 +45,7 @@ class CryptoTracker:
         """Convert USD price to EUR using current exchange rate."""
         eur_usd = yf.Ticker('EURUSD=X')
         exchange_rate = eur_usd.history(period='1d')['Close'].iloc[-1]
-        return round(usd_price / exchange_rate, 2)
+        return round(usd_price / exchange_rate, 1)
 
     def format_price_change(self, change: float, period: str) -> str:
         """Format price change with emoji and period."""
@@ -62,10 +55,7 @@ class CryptoTracker:
 
     def format_price(self, price: float) -> str:
         """Format price based on coin type."""
-        if self.is_ada or self.is_trump:
-            return f"{price:,.2f}"  # Using 4 decimal places for TRUMP token
-        else:
-            return f"{int(price):,}"
+        return f"{int(price):,}"
 
     def calculate_historical_returns(self) -> Dict[str, float]:
         """Calculate returns for all time periods."""
@@ -84,7 +74,7 @@ class CryptoTracker:
                 target_date = current_date - timedelta(days=days)
                 closest_date = min(self.historical_data.index, key=lambda d: abs(d - target_date))
                 historical_price = self.historical_data.loc[closest_date, 'Close']
-                returns[period] = round(((current_price - historical_price) / historical_price) * 100, 2)
+                returns[period] = round(((current_price - historical_price) / historical_price) * 100, 1)
             except:
                 returns[period] = 0  # Handle case where historical data isn't available
 
@@ -97,15 +87,78 @@ class CryptoTracker:
         ath_eur = self.get_eur_price(max_price)
         return max_price, ath_date, ath_eur
 
-    def run(self) -> str:
-        """Generate a complete price report."""
+    def generate_standard_report(self, data: Dict) -> str:
+        """Generate standard Bitcoin price report."""
+        current_data = data['current_data']
+        price_usd = data['price_usd']
+        price_eur = data['price_eur']
+        changes = data['changes']
+        rank = current_data['cmc_rank']
+
+        report = [
+            f"#BTC #Bitcoin (Rank #{rank})",
+            f"{self.format_price(price_usd)} $  &  {self.format_price(price_eur)} €"
+        ]
+
+        for period, change in changes.items():
+            report.append(self.format_price_change(round(change, 2), period))
+        
+        report.append("@Grok, ¿Como ves bitcoin? 🚀📉")
+
+        return '\n'.join(report)
+
+    def generate_detailed_report(self, data: Dict) -> str:
+        """Generate detailed Bitcoin report with supply and volume metrics."""
+        current_data = data['current_data']
+        price_usd = data['price_usd']
+        price_eur = data['price_eur']
+        changes = data['changes']
+        rank = current_data['cmc_rank']
+        ath_price = data['ath_price']
+        ath_date = data['ath_date']
+        ath_eur = data['ath_eur']
+        
+        # Extract additional metrics from the data
+        circulating_supply = current_data['circulating_supply']
+        max_supply = current_data['max_supply']
+        supply_percentage = (circulating_supply / max_supply) * 100 if max_supply else 0
+        volume_24h = current_data['quote']['USD']['volume_24h']
+        market_cap = current_data['quote']['USD']['market_cap']
+        volume_to_mcap = (volume_24h / market_cap) * 100 if market_cap else 0
+
+        report = [
+            f"#BTC #Bitcoin (Rank #{rank})",
+            f"💰 Price: {self.format_price(price_usd)} $ | {self.format_price(price_eur)} €",
+            f"🏆 ATH: {self.format_price(ath_price)} $ ({ath_date.strftime('%d/%m/%Y')})",
+            f"📊 24h Change: {self.format_price_change(round(changes['24h'], 2), '')}"
+        ]
+        
+        # Add supply metrics
+        report.append(f"⛏️ Supply: {int(circulating_supply):,}/{int(max_supply):,} ({round(supply_percentage, 2)}%)")
+        
+        # Add volume metrics
+        report.append(f"💱 24h Volume: ${int(volume_24h/1000000):,}M")
+        report.append(f"📈 Vol/MCap: {round(volume_to_mcap, 2)}%")
+        
+        # Add key period changes
+        report.append("🔍 Performance:")
+        for period in ['7d', '30d', '90d']:
+            if period in changes:
+                report.append(self.format_price_change(round(changes[period], 2), period))
+        
+        report.append("@Grok, what's your Bitcoin forecast? 🧠🚀")
+
+        return '\n'.join(report)
+
+    def run(self, message_type: str = 'standard') -> str:
+        """Generate a complete price report with the specified message format."""
         try:
             # Get all necessary data
             current_data = self.get_current_data()
             historical_data = self.get_historical_data()
 
             # Current prices
-            price_usd = round(current_data['quote']['USD']['price'], 4)  # 4 decimal places for TRUMP
+            price_usd = current_data['quote']['USD']['price']
             price_eur = self.get_eur_price(price_usd)
 
             # Get all time period changes
@@ -124,43 +177,38 @@ class CryptoTracker:
             # Get ATH data
             ath_price, ath_date, ath_eur = self.get_ath_data()
 
-            # Format the report
-            # Get coin rank
-            rank = current_data['cmc_rank']
+            # Prepare data dictionary for report generation
+            data = {
+                'current_data': current_data,
+                'price_usd': price_usd,
+                'price_eur': price_eur,
+                'changes': changes,
+                'ath_price': ath_price,
+                'ath_date': ath_date,
+                'ath_eur': ath_eur
+            }
 
-            if self.cmc_symbol == 'BTC':
-                symbol_tag = '#BTC #Bitcoin'
-            elif self.cmc_symbol == 'ADA':
-                symbol_tag = '#ADA #Cardano'
-            else:
-                symbol_tag = '#TRUMP'
-
-            report = [
-                f"{symbol_tag} (Rank #{rank})",
-                f"{self.format_price(price_usd)} $  &  {self.format_price(price_eur)} €"
-            ]
-
-            # Add all period changes
-
-            report.append(f"ATH -> {ath_date.strftime('%d/%m/%Y')} -> {self.format_price(ath_price)} $  &  {self.format_price(ath_eur)} €")
-            
-            for period, change in changes.items():
+            # Generate report based on message type
+            if message_type == 'detailed':
+                return self.generate_detailed_report(data)
+            else:  # standard format
+                return self.generate_standard_report(data)
                 
-                report.append(self.format_price_change(round(change, 2), period))
-            
-            report.append("@Grok, ¿Como ves bitcoin? 🚀📉")
-
-            return '\n'.join(report)
         except Exception as e:
             print(f"Error generating report: {e}")
             return ""
 
 
 if __name__ == "__main__":
-    # Test all cryptocurrencies
-    for symbol in ['BTC-USD', 'ADA-USD', 'TRUMP-USD']:
-        tracker = CryptoTracker(symbol)
-        report = tracker.run()
-        print(f"{symbol} Report:")
-        print(report)
-        print("\n" + "=" * 50 + "\n")
+    # Test both message formats for Bitcoin
+    tracker = CryptoTracker('BTC-USD')
+    
+    standard_report = tracker.run('standard')
+    print("Standard Report:")
+    print(standard_report)
+    print("\n" + "=" * 50 + "\n")
+    
+    detailed_report = tracker.run('detailed')
+    print("Detailed Report:")
+    print(detailed_report)
+    print("\n" + "=" * 50 + "\n")

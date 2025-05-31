@@ -1,0 +1,46 @@
+name: Bitcoin Tweet Schedule
+
+on:
+  push:
+  schedule:
+    - cron: "59 */2 * * *"  # Run at the 59th minute of every 2nd hour
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.8'
+
+      - name: Install Dependencies from requirements.txt
+        run: |
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; else echo "requirements.txt not found!"; exit 1; fi
+      
+      - name: Run Bitcoin Twitter Bot
+        env:
+          # Twitter API credentials
+          BTC_ACCESS_TOKEN: ${{ secrets.BTC_ACCESS_TOKEN }}
+          BTC_ACCESS_TOKEN_SECRET: ${{ secrets.BTC_ACCESS_TOKEN_SECRET }}
+          BTC_BEARER: ${{ secrets.BTC_BEARER }}
+          BTC_API_KEY: ${{ secrets.BTC_API_KEY }}
+          BTC_API_KEY_SECRET: ${{ secrets.BTC_API_KEY_SECRET }}
+          
+          # News/Movers account credentials
+          NEWS_ACCESS_TOKEN: ${{ secrets.NEWS_ACCESS_TOKEN }}
+          NEWS_ACCESS_TOKEN_SECRET: ${{ secrets.NEWS_ACCESS_TOKEN_SECRET }}
+          NEWS_BEARER: ${{ secrets.NEWS_BEARER }}
+          NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
+          NEWS_API_KEY_SECRET: ${{ secrets.NEWS_API_KEY_SECRET }}
+          
+          # CoinMarketCap API
+          CMC_API_KEY: ${{ secrets.CMC_API_KEY }}
+        run: python ./main.py
