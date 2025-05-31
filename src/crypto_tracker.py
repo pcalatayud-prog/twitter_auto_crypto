@@ -166,7 +166,7 @@ class CryptoTracker:
         ]
         
         # Add supply metrics
-        report.append(f"⛏️ Supply: {int(circulating_supply):,}/{int(max_supply):,} ({round(supply_percentage, 2)}%)")
+        report.append(f"⛏️ Supply -> {round(supply_percentage, 2)}% minado,  {int(circulating_supply):,}/{int(max_supply):,} ")
         
         # Add volume metrics
         report.append(f"💱 24h Volume: ${int(volume_24h/1000000):,}M")
@@ -178,7 +178,7 @@ class CryptoTracker:
             if period in changes:
                 report.append(self.format_price_change(round(changes[period], 2), period))
         
-        report.append("@Grok, what's your Bitcoin forecast? 🧠🚀")
+        report.append("@Grok, que piensas?  🧠🚀")
 
         return '\n'.join(report)
 
