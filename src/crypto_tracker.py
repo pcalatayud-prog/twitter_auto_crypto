@@ -204,7 +204,7 @@ class CryptoTracker:
         price_usd = data['price_usd']
         
         blocks_report += f"\n\nPrice: ${self.format_price(price_usd)} | Rank #{current_data['cmc_rank']}"
-        blocks_report += "\n@Grok, ¿cuándo crees que ocurrirá el halving? 🕙⛓️"
+        blocks_report += f"\n@Grok, ¿Que precio crees que tendra bitcoin en el siguiente halving en {halving_end}? 🕙⛓️"
         
         return blocks_report
 
