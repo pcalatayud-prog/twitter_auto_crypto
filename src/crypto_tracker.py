@@ -154,7 +154,7 @@ class CryptoTracker:
         # Extract additional metrics from the data
         circulating_supply = current_data['circulating_supply']
         max_supply = current_data['max_supply']
-        supply_percentage = (circulating_supply / max_supply) * 100 if max_supply else 0
+        supply_percentage = round((circulating_supply / max_supply) * 100,4) if max_supply else 0
         volume_24h = current_data['quote']['USD']['volume_24h']
         market_cap = current_data['quote']['USD']['market_cap']
         volume_to_mcap = (volume_24h / market_cap) * 100 if market_cap else 0
