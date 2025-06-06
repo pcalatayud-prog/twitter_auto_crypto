@@ -165,11 +165,11 @@ class CryptoTracker:
             f"🏆 ATH: {self.format_price(ath_price)} $ ({ath_date.strftime('%d/%m/%Y')})"]
         
         # Add supply metrics
-        report.append(f"⛏️ Supply -> {round(supply_percentage, 2)}% minado,  {int(circulating_supply):,}/{int(max_supply):,} ")
+        report.append(f"⛏️ Supply -> {round(supply_percentage, 4)}% minado,  {int(circulating_supply):,}/{int(max_supply):,} ")
         
         # Add volume metrics
         report.append(f"💱 24h Volume: ${int(volume_24h/1000000):,}M")
-        report.append(f"📈 Vol/MCap: {round(volume_to_mcap, 2)}%")
+        report.append(f"📈 Vol/MCap: {round(volume_to_mcap, 4)}%")
         
         # Add key period changes
         report.append("🔍 Performance:")
