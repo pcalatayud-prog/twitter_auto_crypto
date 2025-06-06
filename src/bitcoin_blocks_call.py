@@ -38,7 +38,7 @@ def format_twitter_message(block_height, remainder, halving_end):
     return (
         "🟧 #Bitcoin Halving Status:\n\n"
         f"🔢 Bloques minados (Block Height) {block_height:,}\n"
-        f"📦 Progress: {remainder:,} / 210,000 ({percent_complete:.2f}%)\n"
+        f"📦 Progress: {remainder:,} / 210,000 ({percent_complete:.4f}%)\n"
         f"⏳ Bloques restantes para Halving: {blocks_left:,} blocks (~{days_left} days)\n"
         f"📅 Estimacion del siguiente halving: {formatted_time}\n"
         "#BTC #Halving #Crypto"
