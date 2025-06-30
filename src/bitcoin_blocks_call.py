@@ -2,6 +2,8 @@ import requests
 from datetime import datetime, timedelta
 from loguru import logger
 
+Reward_BTC = 3.125
+
 def get_last_block_info():
     try:
         # Get the latest block hash
@@ -13,13 +15,11 @@ def get_last_block_info():
         block_data = requests.get(f"https://blockchain.info/rawblock/{block_hash}").json()
 
         # Extract key information
-        timestamp = datetime.utcfromtimestamp(block_data['time']).strftime('%Y-%m-%d %H:%M:%S UTC')
-        tx_count = len(block_data['tx'])
         block_reward_satoshis = block_data['tx'][0]['out'][0]['value']
         block_reward_btc = block_reward_satoshis / 1e8
 
-        fees = round(data['reward_btc']-3.125,8)
-        
+        fees = round(block_reward_btc-Reward_BTC,8)
+
         return fees
 
 
