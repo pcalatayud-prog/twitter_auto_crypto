@@ -2,6 +2,30 @@ import requests
 from datetime import datetime, timedelta
 from loguru import logger
 
+def get_last_block_info():
+    try:
+        # Get the latest block hash
+        latest_block = requests.get("https://blockchain.info/latestblock").json()
+        block_hash = latest_block['hash']
+        block_height = latest_block['height']
+
+        # Get full block data
+        block_data = requests.get(f"https://blockchain.info/rawblock/{block_hash}").json()
+
+        # Extract key information
+        timestamp = datetime.utcfromtimestamp(block_data['time']).strftime('%Y-%m-%d %H:%M:%S UTC')
+        tx_count = len(block_data['tx'])
+        block_reward_satoshis = block_data['tx'][0]['out'][0]['value']
+        block_reward_btc = block_reward_satoshis / 1e8
+
+        fees = round(data['reward_btc']-3.125,8)
+        
+        return fees
+
+
+    except Exception as e:
+        return {"error": str(e)}
+
 def get_bitcoin_block_height():
     """
     Fetches the current Bitcoin block height from Blockstream's public API.
@@ -35,12 +59,16 @@ def format_twitter_message(block_height, remainder, halving_end):
     time_left = halving_end - datetime.utcnow()
     days_left = int(time_left.total_seconds() // (60 * 60 * 24))
 
+    fees = get_last_block_info()
+
     return (
         "🟧 #Bitcoin Halving Status:\n\n"
         f"🔢 Bloques minados (Block Height) {block_height:,}\n"
         f"📦 Progress: {remainder:,} / 210,000 ({percent_complete:.4f}%)\n"
         f"⏳ Bloques restantes para Halving: {blocks_left:,} blocks (~{days_left} days)\n"
         f"📅 Estimacion del siguiente halving: {formatted_time}\n"
+        f"💰La recompensa actual por bloque minado en Bitcoin es de 3.125 BTC\n"
+        f"💸 Comisiones en el último bloque: {fees} BTC\n"        
         "#BTC #Halving #Crypto"
     )
 
