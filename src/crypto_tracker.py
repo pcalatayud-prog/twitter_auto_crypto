@@ -195,6 +195,8 @@ class CryptoTracker:
         # Calculate halving-related metrics
         remainder = block_height % 210_000
         halving_end = estimate_halving_end(remainder)
+
+        formatted_time = halving_end.strftime('%b %d, %Y %H:%M UTC')
         
         # Create the formatted message
         blocks_report = format_twitter_message(block_height, remainder, halving_end)
@@ -204,7 +206,7 @@ class CryptoTracker:
         price_usd = data['price_usd']
         
         blocks_report += f"\n\nPrecio Actual ${self.format_price(price_usd)} | Rank #{current_data['cmc_rank']}"
-        blocks_report += f"\n@Grok, ¿Que precio crees que tendra bitcoin en el siguiente halving en {halving_end}? 🕙⛓️"
+        blocks_report += f"\n@Grok, ¿Que precio crees que tendra bitcoin en el siguiente halving en {formatted_time}? 🕙⛓️"
         
         return blocks_report
 
