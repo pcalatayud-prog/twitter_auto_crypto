@@ -161,18 +161,18 @@ class CryptoTracker:
 
         report = [
             f"#BTC #Bitcoin (Rank #{rank})",
-            f"💰 Price: {self.format_price(price_usd)} $ | {self.format_price(price_eur)} €",
+            f"💰 Precio: {self.format_price(price_usd)} $ | {self.format_price(price_eur)} €",
             f"🏆 ATH: {self.format_price(ath_price)} $ ({ath_date.strftime('%d/%m/%Y')})"]
         
         # Add supply metrics
         report.append(f"⛏️ Supply -> {round(supply_percentage, 4)}% minado,  {int(circulating_supply):,}/{int(max_supply):,} ")
         
         # Add volume metrics
-        report.append(f"💱 24h Volume: ${int(volume_24h/1000000):,}M")
+        report.append(f"💱 24h Volumen: ${int(volume_24h/1000000):,}M")
         report.append(f"📈 Vol/MCap: {round(volume_to_mcap, 4)}%")
         
         # Add key period changes
-        report.append("🔍 Performance:")
+        report.append("🔍 Rendimientos:")
         for period in ['7d', '30d', '90d']:
             if period in changes:
                 report.append(self.format_price_change(round(changes[period], 2), period))
@@ -203,7 +203,7 @@ class CryptoTracker:
         current_data = data['current_data']
         price_usd = data['price_usd']
         
-        blocks_report += f"\n\nPrice: ${self.format_price(price_usd)} | Rank #{current_data['cmc_rank']}"
+        blocks_report += f"\n\nPrecio Actual ${self.format_price(price_usd)} | Rank #{current_data['cmc_rank']}"
         blocks_report += f"\n@Grok, ¿Que precio crees que tendra bitcoin en el siguiente halving en {halving_end}? 🕙⛓️"
         
         return blocks_report

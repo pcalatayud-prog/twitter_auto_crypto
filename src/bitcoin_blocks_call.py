@@ -61,13 +61,17 @@ def format_twitter_message(block_height, remainder, halving_end):
 
     fees = get_last_block_info()
 
+    # In case that there is an error and the fees are negative
+    if fees < 0:
+        fees = 0
+
     return (
         "🟧 #Bitcoin Halving Status:\n\n"
-        f"🔢 Bloques minados (Block Height) {block_height:,}\n"
-        f"📦 Progress: {remainder:,} / 210,000 ({percent_complete:.4f}%)\n"
+        f"🔢 Bloques minados {block_height:,}\n"
+        f"📦 Progreso {remainder:,} / 210,000 ({percent_complete:.4f}%)\n"
         f"⏳ Bloques restantes para Halving: {blocks_left:,} blocks (~{days_left} days)\n"
-        f"📅 Estimacion del siguiente halving: {formatted_time}\n"
-        f"💰La recompensa actual por bloque minado en Bitcoin es de 3.125 BTC\n"
+        f"📅 Siguiente halving: {formatted_time}\n"
+        f"💰 La recompensa actual por bloque minado en Bitcoin es de {Reward_BTC} BTC\n"
         f"💸 Comisiones en el último bloque: {fees} BTC\n"        
         "#BTC #Halving #Crypto"
     )
