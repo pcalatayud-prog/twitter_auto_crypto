@@ -87,7 +87,7 @@ logger.error("The program couldn't perform some function due to a problem")
 logger.critical("The program cannot continue running")
 ```
 
-## Environment
+## Env
 
 Use conda for environment management:
 
